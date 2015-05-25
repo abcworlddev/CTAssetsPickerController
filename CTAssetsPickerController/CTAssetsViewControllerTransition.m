@@ -28,6 +28,7 @@
 #import "CTAssetsViewControllerTransition.h"
 #import "CTAssetsViewController.h"
 #import "CTAssetsPageViewController.h"
+#import "CTAssetsPickerController.h"
 
 
 
@@ -182,7 +183,10 @@
                              if (toVC.collectionView.indexPathsForSelectedItems.count > 0)
                              {
                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                     [toVC.navigationController setToolbarHidden:NO animated:YES];
+                                     CTAssetsPickerController *picker = (CTAssetsPickerController *)toVC.navigationController.parentViewController;
+                                     if (!picker.disableAssetSelectMode) {
+                                         [toVC.navigationController setToolbarHidden:NO animated:YES];
+                                     }
                                  });
                              }
                              

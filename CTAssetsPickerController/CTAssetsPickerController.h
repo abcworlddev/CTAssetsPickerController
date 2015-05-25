@@ -92,6 +92,14 @@
 @property (nonatomic, assign) BOOL alwaysEnableDoneButton;
 
 /**
+ *  Determines whether or not use asset select mode - in other words, only browse mode not pickup mode.
+ *
+ *  When click any assets, it selects assets but set to YES in order to do only browse albums.
+ *  set this property’s value to `YES`.
+ */
+@property (nonatomic, assign) BOOL disableAssetSelectMode;
+
+/**
  *  The navigation controller of the picker hierarchy. (read-only)
  *
  *  This property contains the child navigation controller of the picker.

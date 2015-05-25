@@ -52,6 +52,7 @@ NSString * const CTAssetsPickerSelectedAssetsChangedNotification = @"CTAssetsPic
         _showsCancelButton      = YES;
         _showsNumberOfAssets    = YES;
         _alwaysEnableDoneButton = NO;
+        _disableAssetSelectMode = NO;
         
         self.preferredContentSize = CTAssetPickerPopoverContentSize;
         

@@ -128,16 +128,18 @@
                                         action:@selector(dismiss:)];
     }
     
-    self.navigationItem.rightBarButtonItem =
-    [[UIBarButtonItem alloc] initWithTitle:CTAssetsPickerControllerLocalizedString(@"Done")
-                                     style:UIBarButtonItemStyleDone
-                                    target:self.picker
-                                    action:@selector(finishPickingAssets:)];
-    
-    if (self.picker.alwaysEnableDoneButton)
-        self.navigationItem.rightBarButtonItem.enabled = YES;
-    else
-        self.navigationItem.rightBarButtonItem.enabled = (self.picker.selectedAssets.count > 0);
+    if (!self.picker.disableAssetSelectMode) {
+        self.navigationItem.rightBarButtonItem =
+        [[UIBarButtonItem alloc] initWithTitle:CTAssetsPickerControllerLocalizedString(@"Done")
+                                         style:UIBarButtonItemStyleDone
+                                        target:self.picker
+                                        action:@selector(finishPickingAssets:)];
+        
+        if (self.picker.alwaysEnableDoneButton)
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        else
+            self.navigationItem.rightBarButtonItem.enabled = (self.picker.selectedAssets.count > 0);
+    }
 }
 
 - (void)setupToolbar
@@ -345,7 +347,9 @@
     
     [[self.toolbarItems objectAtIndex:1] setTitle:[self.picker toolbarTitle]];
     
-    [self.navigationController setToolbarHidden:(selectedAssets.count == 0) animated:YES];
+    if (!self.picker.disableAssetSelectMode) {
+        [self.navigationController setToolbarHidden:(selectedAssets.count == 0) animated:YES];
+    }
 }
 
 

@@ -97,6 +97,7 @@
     CTAssetsPickerController *picker = [[CTAssetsPickerController alloc] init];
     picker.assetsFilter         = [ALAssetsFilter allAssets];
     picker.showsCancelButton    = (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad);
+    picker.disableAssetSelectMode = YES;
     picker.delegate             = self;
     picker.selectedAssets       = [NSMutableArray arrayWithArray:self.assets];
     
@@ -161,10 +162,11 @@
 
 #pragma mark - Assets Picker Delegate
 
-- (BOOL)assetsPickerController:(CTAssetsPickerController *)picker isDefaultAssetsGroup:(ALAssetsGroup *)group
-{
-    return ([[group valueForProperty:ALAssetsGroupPropertyType] integerValue] == ALAssetsGroupSavedPhotos);
-}
+//- (BOOL)assetsPickerController:(CTAssetsPickerController *)picker isDefaultAssetsGroup:(ALAssetsGroup *)group
+//{
+////    return ([[group valueForProperty:ALAssetsGroupPropertyType] integerValue] == ALAssetsGroupSavedPhotos);
+//    return NO;
+//}
 
 - (void)assetsPickerController:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
 {

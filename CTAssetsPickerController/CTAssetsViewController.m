@@ -139,16 +139,18 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
 
 - (void)setupButtons
 {
-    self.navigationItem.rightBarButtonItem =
-    [[UIBarButtonItem alloc] initWithTitle:CTAssetsPickerControllerLocalizedString(@"Done")
-                                     style:UIBarButtonItemStyleDone
-                                    target:self.picker
-                                    action:@selector(finishPickingAssets:)];
-    
-    if (self.picker.alwaysEnableDoneButton)
-        self.navigationItem.rightBarButtonItem.enabled = YES;
-    else
-        self.navigationItem.rightBarButtonItem.enabled = (self.picker.selectedAssets.count > 0);
+    if (!self.picker.disableAssetSelectMode) {
+        self.navigationItem.rightBarButtonItem =
+        [[UIBarButtonItem alloc] initWithTitle:CTAssetsPickerControllerLocalizedString(@"Done")
+                                         style:UIBarButtonItemStyleDone
+                                        target:self.picker
+                                        action:@selector(finishPickingAssets:)];
+        
+        if (self.picker.alwaysEnableDoneButton)
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        else
+            self.navigationItem.rightBarButtonItem.enabled = (self.picker.selectedAssets.count > 0);
+    }
 }
 
 - (void)setupToolbar
@@ -278,7 +280,10 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
     
     [[self.toolbarItems objectAtIndex:1] setTitle:[self.picker toolbarTitle]];
     
-    [self.navigationController setToolbarHidden:(selectedAssets.count == 0) animated:YES];
+    
+    if (!self.picker.disableAssetSelectMode) {
+        [self.navigationController setToolbarHidden:(selectedAssets.count == 0) animated:YES];
+    }
     
     // Reload assets for calling de/selectAsset method programmatically
     [self.collectionView reloadData];
@@ -299,6 +304,14 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
 
 #pragma mark - Push Assets Page View Controller
 
+- (void)pushPageViewControllerWithIndex:(NSInteger)index
+{
+    CTAssetsPageViewController *vc = [[CTAssetsPageViewController alloc] initWithAssets:self.assets];
+    vc.pageIndex = index;
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
 - (void)pushPageViewController:(UILongPressGestureRecognizer *)longPress
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
@@ -306,10 +319,7 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
         CGPoint point           = [longPress locationInView:self.collectionView];
         NSIndexPath *indexPath  = [self.collectionView indexPathForItemAtPoint:point];
 
-        CTAssetsPageViewController *vc = [[CTAssetsPageViewController alloc] initWithAssets:self.assets];
-        vc.pageIndex = indexPath.item;
-
-        [self.navigationController pushViewController:vc animated:YES];
+        [self pushPageViewControllerWithIndex:indexPath.item];
     }
 }
 
@@ -432,12 +442,17 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    ALAsset *asset = [self.assets objectAtIndex:indexPath.row];
-    
-    [self.picker selectAsset:asset];
-    
-    if ([self.picker.delegate respondsToSelector:@selector(assetsPickerController:didSelectAsset:)])
-        [self.picker.delegate assetsPickerController:self.picker didSelectAsset:asset];
+    if (!self.picker.disableAssetSelectMode) {
+        ALAsset *asset = [self.assets objectAtIndex:indexPath.row];
+        
+        [self.picker selectAsset:asset];
+        
+        if ([self.picker.delegate respondsToSelector:@selector(assetsPickerController:didSelectAsset:)])
+            [self.picker.delegate assetsPickerController:self.picker didSelectAsset:asset];
+    } else {
+        [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+        [self pushPageViewControllerWithIndex:indexPath.item];
+    }
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldDeselectItemAtIndexPath:(NSIndexPath *)indexPath
@@ -452,12 +467,14 @@ NSString * const CTAssetsSupplementaryViewIdentifier = @"CTAssetsSupplementaryVi
 
 - (void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    ALAsset *asset = [self.assets objectAtIndex:indexPath.row];
-    
-    [self.picker deselectAsset:asset];
-    
-    if ([self.picker.delegate respondsToSelector:@selector(assetsPickerController:didDeselectAsset:)])
-        [self.picker.delegate assetsPickerController:self.picker didDeselectAsset:asset];
+    if (!self.picker.disableAssetSelectMode) {
+        ALAsset *asset = [self.assets objectAtIndex:indexPath.row];
+        
+        [self.picker deselectAsset:asset];
+        
+        if ([self.picker.delegate respondsToSelector:@selector(assetsPickerController:didDeselectAsset:)])
+            [self.picker.delegate assetsPickerController:self.picker didDeselectAsset:asset];
+    }
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath
